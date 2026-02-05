@@ -1,137 +1,179 @@
-import { ApiKeyCheck } from "@/components/ApiKeyCheck";
-import Image from "next/image";
+"use client";
 
-const KeyFilesSection = () => (
-  <div className="bg-white px-8 py-4">
-    <h2 className="text-xl font-semibold mb-4">How it works:</h2>
-    <ul className="space-y-4 text-gray-600">
-      <li className="flex items-start gap-2">
-        <span>📄</span>
-        <span>
-          <code className="font-medium">src/app/layout.tsx</code> - Main layout
-          with TamboProvider
-        </span>
-      </li>
-      <li className="flex items-start gap-2">
-        <span>📄</span>
-        <span>
-          <code className="font-medium font-mono">src/app/chat/page.tsx</code> -
-          Chat page with TamboProvider and MCP integration
-        </span>
-      </li>
-      <li className="flex items-start gap-2">
-        <span>📄</span>
-        <span>
-          <code className="font-medium font-mono">
-            src/app/interactables/page.tsx
-          </code>{" "}
-          - Interactive demo page with tools and components
-        </span>
-      </li>
-      <li className="flex items-start gap-2">
-        <span>📄</span>
-        <span>
-          <code className="font-medium font-mono">
-            src/components/tambo/message-thread-full.tsx
-          </code>{" "}
-          - Chat UI
-        </span>
-      </li>
-      <li className="flex items-start gap-2">
-        <span>📄</span>
-        <span>
-          <code className="font-medium font-mono">
-            src/components/tambo/graph.tsx
-          </code>{" "}
-          - A generative graph component
-        </span>
-      </li>
-      <li className="flex items-start gap-2">
-        <span>📄</span>
-        <span>
-          <code className="font-medium font-mono">
-            src/services/population-stats.ts
-          </code>{" "}
-          - Example tool implementation with mock population data
-        </span>
-      </li>
-      <li className="flex items-start gap-2">
-        <span className="text-blue-500">📄</span>
-        <span>
-          <code className="font-medium font-mono">src/lib/tambo.ts</code> -
-          Component and tool registration
-        </span>
-      </li>
-      <li className="flex items-start gap-2">
-        <span className="text-blue-500">📄</span>
-        <span>
-          <code className="font-medium font-mono">README.md</code> - For more
-          details check out the README
-        </span>
-      </li>
-    </ul>
-    <div className="flex gap-4 flex-wrap mt-4">
-      <a
-        href="https://docs.tambo.co"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="px-6 py-3 rounded-md font-medium transition-colors text-lg mt-4 border border-gray-300 hover:bg-gray-50"
-      >
-        View Docs
-      </a>
-      <a
-        href="https://tambo.co/dashboard"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="px-6 py-3 rounded-md font-medium transition-colors text-lg mt-4 border border-gray-300 hover:bg-gray-50"
-      >
-        Dashboard
-      </a>
+import { TamboProvider, useTamboThread, useTamboThreadInput } from "@tambo-ai/react";
+import { components, tools, contextHelpers } from "@/lib/tambo";
+import { Send, Brain, Sparkles } from "lucide-react";
+import { useEffect, useRef } from "react";
+
+function ChatInterface() {
+  const { thread } = useTamboThread();
+  const { value, setValue, submit, isPending } = useTamboThreadInput();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [thread.messages]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (value.trim() && !isPending) {
+      submit();
+    }
+  };
+
+  const suggestions = [
+    "Show me my tasks for today",
+    "Create a focus session for 25 minutes",
+    "Analyze my productivity this week",
+    "Show my calendar for this week",
+    "Create a note about project ideas",
+    "Track my daily habits",
+  ];
+
+  return (
+    <div className="flex flex-col h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b sticky top-0 z-10">
+        <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-3">
+            <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-2 rounded-lg">
+              <Brain className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">
+                Personal Productivity Brain
+              </h1>
+              <p className="text-sm text-gray-600">
+                AI-powered productivity assistant
+              </p>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
+          {thread.messages.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="bg-gradient-to-r from-indigo-600 to-purple-600 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Sparkles className="w-10 h-10 text-white" />
+              </div>
+              <h2 className="text-3xl font-bold text-gray-800 mb-3">
+                Welcome to Your Productivity Brain
+              </h2>
+              <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
+                I'm your AI assistant that adapts to your productivity needs. Tell
+                me what you want to do, and I'll show you the right interface.
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-w-3xl mx-auto">
+                {suggestions.map((suggestion, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setValue(suggestion)}
+                    className="p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-all text-left border border-gray-200 hover:border-indigo-300"
+                  >
+                    <p className="text-sm text-gray-700">{suggestion}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : (
+            thread.messages.map((message) => (
+              <div
+                key={message.id}
+                className={`flex ${
+                  message.role === "user" ? "justify-end" : "justify-start"
+                }`}
+              >
+                <div
+                  className={`max-w-3xl ${
+                    message.role === "user"
+                      ? "bg-indigo-600 text-white rounded-2xl rounded-br-sm"
+                      : "bg-white text-gray-800 rounded-2xl rounded-bl-sm shadow-md"
+                  } px-6 py-4`}
+                >
+                  {/* Text Content */}
+                  {Array.isArray(message.content) ? (
+                    message.content.map((part, i) =>
+                      part.type === "text" ? (
+                        <p key={i} className="whitespace-pre-wrap">
+                          {part.text}
+                        </p>
+                      ) : null
+                    )
+                  ) : (
+                    <p className="whitespace-pre-wrap">{String(message.content)}</p>
+                  )}
+
+                  {/* Rendered Component */}
+                  {message.renderedComponent && (
+                    <div className="mt-4">{message.renderedComponent}</div>
+                  )}
+                </div>
+              </div>
+            ))
+          )}
+
+          {isPending && (
+            <div className="flex justify-start">
+              <div className="bg-white rounded-2xl rounded-bl-sm shadow-md px-6 py-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-indigo-600 rounded-full animate-bounce" />
+                  <div
+                    className="w-2 h-2 bg-indigo-600 rounded-full animate-bounce"
+                    style={{ animationDelay: "0.1s" }}
+                  />
+                  <div
+                    className="w-2 h-2 bg-indigo-600 rounded-full animate-bounce"
+                    style={{ animationDelay: "0.2s" }}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div ref={messagesEndRef} />
+        </div>
+      </div>
+
+      {/* Input */}
+      <div className="bg-white border-t shadow-lg sticky bottom-0">
+        <div className="max-w-4xl mx-auto px-4 py-4">
+          <form onSubmit={handleSubmit} className="flex gap-3">
+            <input
+              type="text"
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              placeholder="Tell me what you want to do..."
+              className="flex-1 px-6 py-4 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-800 placeholder-gray-400"
+              disabled={isPending}
+            />
+            <button
+              type="submit"
+              disabled={isPending || !value.trim()}
+              className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-4 rounded-2xl font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg"
+            >
+              <Send className="w-5 h-5" />
+              Send
+            </button>
+          </form>
+        </div>
+      </div>
     </div>
-  </div>
-);
+  );
+}
 
 export default function Home() {
   return (
-    <div className="min-h-screen p-8 flex flex-col items-center justify-center font-[family-name:var(--font-geist-sans)]">
-      <main className="max-w-2xl w-full space-y-8">
-        <div className="flex flex-col items-center">
-          <a href="https://tambo.co" target="_blank" rel="noopener noreferrer">
-            <Image
-              src="/Octo-Icon.svg"
-              alt="Tambo AI Logo"
-              width={80}
-              height={80}
-              className="mb-4"
-            />
-          </a>
-          <h1 className="text-4xl text-center">tambo-ai chat template</h1>
-        </div>
-
-        <div className="w-full space-y-8">
-          <div className="bg-white px-8 py-4">
-            <h2 className="text-xl font-semibold mb-4">Setup Checklist</h2>
-            <ApiKeyCheck>
-              <div className="flex gap-4 flex-wrap">
-                <a
-                  href="/chat"
-                  className="px-6 py-3 rounded-md font-medium shadow-sm transition-colors text-lg mt-4 bg-[#7FFFC3] hover:bg-[#72e6b0] text-gray-800"
-                >
-                  Go to Chat →
-                </a>
-                <a
-                  href="/interactables"
-                  className="px-6 py-3 rounded-md font-medium shadow-sm transition-colors text-lg mt-4 bg-[#FFE17F] hover:bg-[#f5d570] text-gray-800"
-                >
-                  Interactables Demo →
-                </a>
-              </div>
-            </ApiKeyCheck>
-          </div>
-
-          <KeyFilesSection />
-        </div>
-      </main>
-    </div>
+    <TamboProvider
+      apiKey={process.env.NEXT_PUBLIC_TAMBO_API_KEY || "demo_key"}
+      components={components}
+      tools={tools}
+      contextHelpers={contextHelpers}
+    >
+      <ChatInterface />
+    </TamboProvider>
   );
 }

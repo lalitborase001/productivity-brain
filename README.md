@@ -1,131 +1,276 @@
-# Tambo Template
+# Personal Productivity Brain 🧠
 
-This is a starter NextJS app with Tambo hooked up to get your AI app development started quickly.
+An AI-powered productivity application built with [Tambo](https://tambo.co) that uses **Generative UI** to dynamically render the right interface based on your natural language requests.
 
-## Get Started
+## 🌟 Features
 
-1. Run `npm create-tambo@latest my-tambo-app` for a new project
+### Smart Component Rendering
+The AI decides which components to show you based on what you ask for:
+- **Task Management**: Lists, Kanban boards, statistics
+- **Time Management**: Calendar, time blocks, focus timer
+- **Note Taking**: Quick notes and organized grids
+- **Goal Tracking**: Progress visualization and milestones
+- **Habit Building**: Streak tracking and daily checkoffs
+- **Analytics**: Productivity reports and charts
 
-2. `npm install`
+### Generative vs Interactable
+- **Generative Components**: Rendered once (charts, reports, summaries)
+- **Interactable Components**: Persistent and updateable (tasks, notes, calendar)
 
-3. `npx tambo init`
+### Local Tools
+The AI can execute browser-side functions to:
+- Add, update, and delete tasks
+- Schedule calendar events
+- Create notes
+- Analyze productivity metrics
+- Suggest optimal focus times
 
-- or rename `example.env.local` to `.env.local` and add your tambo API key you can get for free [here](https://tambo.co/dashboard).
+## 🚀 Getting Started
 
-4. Run `npm run dev` and go to `localhost:3000` to use the app!
+### Prerequisites
+- Node.js 22+ and npm 11+
+- A Tambo API key (get one at [tambo.co](https://tambo.co))
 
-## Customizing
+### Installation
 
-### Change what components tambo can control
-
-You can see how components are registered with tambo in `src/lib/tambo.ts`:
-
-```tsx
-export const components: TamboComponent[] = [
-  {
-    name: "Graph",
-    description:
-      "A component that renders various types of charts (bar, line, pie) using Recharts. Supports customizable data visualization with labels, datasets, and styling options.",
-    component: Graph,
-    propsSchema: graphSchema,
-  },
-  // Add more components here
-];
-```
-
-You can install the graph component into any project with:
-
+1. **Clone and Install**
 ```bash
-npx tambo add graph
+git clone <your-repo>
+cd productivity-brain
+npm install
 ```
 
-The example Graph component demonstrates several key features:
+2. **Configure Tambo**
+```bash
+# Option 1: Use Tambo Cloud (easiest)
+npx tambo init
+# Follow prompts and select "Tambo Cloud"
 
-- Different prop types (strings, arrays, enums, nested objects)
-- Multiple chart types (bar, line, pie)
-- Customizable styling (variants, sizes)
-- Optional configurations (title, legend, colors)
-- Data visualization capabilities
+# Option 2: Self-hosted
+npx tambo init
+# Select "Self-hosted" and follow Docker setup
+```
 
-Update the `components` array with any component(s) you want tambo to be able to use in a response!
+3. **Set Environment Variables**
+```bash
+# Copy the example file
+cp .env.example .env.local
 
-You can find more information about the options [here](https://docs.tambo.co/concepts/generative-interfaces/generative-components)
+# Edit .env.local and add your Tambo API key
+NEXT_PUBLIC_TAMBO_API_KEY=your_tambo_api_key_here
+```
 
-### Add tools for tambo to use
+4. **Run Development Server**
+```bash
+npm run dev
+```
 
-Tools are defined with `inputSchema` and `outputSchema`:
+5. **Open Browser**
+Navigate to [http://localhost:3000](http://localhost:3000)
 
-```tsx
-export const tools: TamboTool[] = [
-  {
-    name: "globalPopulation",
-    description:
-      "A tool to get global population trends with optional year range filtering",
-    tool: getGlobalPopulationTrend,
-    inputSchema: z.object({
-      startYear: z.number().optional(),
-      endYear: z.number().optional(),
-    }),
-    outputSchema: z.array(
-      z.object({
-        year: z.number(),
-        population: z.number(),
-        growthRate: z.number(),
-      }),
-    ),
+## 📖 How It Works
+
+### Tambo Architecture
+
+**Components** are registered with descriptions and Zod schemas:
+```typescript
+{
+  name: "TaskList",
+  description: "Displays tasks in list format",
+  component: TaskList,
+  propsSchema: z.object({
+    filterStatus: z.enum(["all", "todo", "in-progress", "done"]).optional(),
+  }),
+}
+```
+
+**Tools** are functions the AI can call:
+```typescript
+{
+  name: "add-task",
+  description: "Creates a new task",
+  tool: (params) => storage.addTask(params),
+  toolSchema: z.function().args(...).returns(...),
+}
+```
+
+The AI reads your message, decides which components and tools to use, and renders the appropriate UI.
+
+## 💡 Example Interactions
+
+Try these prompts:
+
+### Task Management
+- "Show me my tasks for today"
+- "Add a high priority task to review the quarterly report"
+- "Display tasks in a Kanban board"
+- "Show me statistics about my tasks this week"
+
+### Time Management
+- "Show my calendar for this week"
+- "Start a 25-minute focus session for coding"
+- "Suggest optimal times for deep work today"
+- "Create a time-blocked schedule for tomorrow"
+
+### Notes & Ideas
+- "Create a note about feature ideas for the app"
+- "Show all my notes tagged with 'project'"
+
+### Goals & Habits
+- "Track my progress on active goals"
+- "Show my habit tracker"
+- "Generate a weekly plan with priorities"
+
+### Analytics
+- "Analyze my productivity this week"
+- "Show a chart of my focus time for the month"
+- "Create a productivity report for today"
+
+## 🏗️ Project Structure
+
+```
+productivity-brain/
+├── src/
+│   ├── app/                 # Next.js app directory
+│   │   ├── page.tsx        # Main chat interface
+│   │   ├── layout.tsx      # Root layout
+│   │   └── globals.css     # Global styles
+│   ├── components/          # All UI components
+│   │   ├── TaskList.tsx
+│   │   ├── TaskBoard.tsx
+│   │   ├── Calendar.tsx
+│   │   ├── FocusTimer.tsx
+│   │   └── ... (13 total)
+│   ├── lib/
+│   │   ├── tambo.ts        # Tambo configuration
+│   │   └── storage.ts      # LocalStorage utilities
+│   └── types/
+│       └── index.ts        # TypeScript type definitions
+├── package.json
+├── tsconfig.json
+├── tailwind.config.ts
+└── next.config.js
+```
+
+## 🎨 Component Library
+
+### Task Components
+- `TaskList` - List view with filters
+- `TaskBoard` - Kanban board
+- `TaskStats` - Analytics dashboard
+
+### Time Components
+- `Calendar` - Month/week/day views
+- `TimeBlocks` - Hourly schedule
+- `FocusTimer` - Pomodoro timer
+
+### Content Components
+- `NoteCard` - Individual note
+- `NotesGrid` - All notes view
+- `GoalTracker` - Goal progress
+- `HabitTracker` - Habit streaks
+
+### Analytics Components
+- `ProductivityReport` - Comprehensive report
+- `ProgressChart` - Data visualization
+- `WeeklyPlanner` - AI-generated plan
+
+## 🔧 Customization
+
+### Adding New Components
+
+1. **Create Component** in `src/components/`
+```typescript
+export default function MyComponent({ prop1, prop2 }: MyProps) {
+  return <div>...</div>;
+}
+```
+
+2. **Register in Tambo** in `src/lib/tambo.ts`
+```typescript
+{
+  name: "MyComponent",
+  description: "What it does and when to use it",
+  component: MyComponent,
+  propsSchema: z.object({
+    prop1: z.string(),
+    prop2: z.number().optional(),
+  }),
+}
+```
+
+### Adding New Tools
+
+```typescript
+{
+  name: "my-tool",
+  description: "What this tool does",
+  tool: (params) => {
+    // Your logic here
+    return result;
   },
-];
+  toolSchema: z.function().args(...).returns(...),
+}
 ```
 
-Find more information about tools [here.](https://docs.tambo.co/concepts/tools)
+## 📦 Storage
 
-### The Magic of Tambo Requires the TamboProvider
+Data is stored in `localStorage`:
+- Tasks: `productivity-brain-tasks`
+- Events: `productivity-brain-events`
+- Notes: `productivity-brain-notes`
+- Goals: `productivity-brain-goals`
+- Habits: `productivity-brain-habits`
+- Focus Sessions: `productivity-brain-focus-sessions`
 
-Make sure in the TamboProvider wrapped around your app:
+To implement backend storage:
+1. Replace functions in `src/lib/storage.ts`
+2. Use your preferred backend (Supabase, Firebase, etc.)
+3. Update tool implementations to use async functions
 
-```tsx
-...
-<TamboProvider
-  apiKey={process.env.NEXT_PUBLIC_TAMBO_API_KEY!}
-  components={components} // Array of components to control
-  tools={tools} // Array of tools it can use
->
-  {children}
-</TamboProvider>
+## 🚢 Deployment
+
+### Vercel (Recommended)
+```bash
+npm install -g vercel
+vercel
 ```
 
-In this example we do this in the `Layout.tsx` file, but you can do it anywhere in your app that is a client component.
-
-### Voice input
-
-The template includes a `DictationButton` component using the `useTamboVoice` hook for speech-to-text input.
-
-### MCP (Model Context Protocol)
-
-The template includes MCP support for connecting to external tools and resources. You can use the MCP hooks from `@tambo-ai/react/mcp`:
-
-- `useTamboMcpPromptList` - List available prompts from MCP servers
-- `useTamboMcpPrompt` - Get a specific prompt
-- `useTamboMcpResourceList` - List available resources
-
-See `src/components/tambo/mcp-components.tsx` for example usage.
-
-### Change where component responses are shown
-
-The components used by tambo are shown alongside the message response from tambo within the chat thread, but you can have the result components show wherever you like by accessing the latest thread message's `renderedComponent` field:
-
-```tsx
-const { thread } = useTambo();
-const latestComponent =
-  thread?.messages[thread.messages.length - 1]?.renderedComponent;
-
-return (
-  <div>
-    {latestComponent && (
-      <div className="my-custom-wrapper">{latestComponent}</div>
-    )}
-  </div>
-);
+### Other Platforms
+Build the production app:
+```bash
+npm run build
+npm run start
 ```
 
-For more detailed documentation, visit [Tambo's official docs](https://docs.tambo.co).
+Deploy the `.next` folder to your platform of choice.
+
+## 🤝 Contributing
+
+Contributions are welcome! Areas for improvement:
+- Additional productivity components
+- Backend integration
+- Mobile responsiveness
+- Accessibility enhancements
+- More AI tool integrations
+
+## 📝 License
+
+MIT License - feel free to use this for your own projects!
+
+## 🙏 Acknowledgments
+
+- Built with [Tambo](https://tambo.co) - Generative UI SDK
+- UI components styled with [Tailwind CSS](https://tailwindcss.com)
+- Icons from [Lucide](https://lucide.dev)
+- Charts powered by [Recharts](https://recharts.org)
+
+## 📚 Resources
+
+- [Tambo Documentation](https://docs.tambo.co)
+- [Tambo GitHub](https://github.com/tambo-ai/tambo)
+- [Next.js Documentation](https://nextjs.org/docs)
+
+---
+
+**Built with ❤️ using Generative UI**

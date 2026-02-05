@@ -1,0 +1,112 @@
+# Quick Start Guide 🚀
+
+Get your Personal Productivity Brain up and running in 5 minutes!
+
+## Step 1: Install Dependencies
+```bash
+npm install
+```
+
+## Step 2: Get Tambo API Key
+
+### Option A: Tambo Cloud (Easiest)
+1. Visit [tambo.co](https://tambo.co)
+2. Sign up for a free account
+3. Create a project
+4. Copy your API key
+
+### Option B: Self-Hosted
+```bash
+npx tambo init
+# Select "Self-hosted" and follow Docker setup instructions
+```
+
+## Step 3: Configure Environment
+```bash
+# Create environment file
+cp .env.example .env.local
+
+# Edit .env.local and add your API key
+NEXT_PUBLIC_TAMBO_API_KEY=your_api_key_here
+```
+
+## Step 4: Run the App
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser!
+
+## Step 5: Add Sample Data (Optional)
+
+1. Open browser console (F12)
+2. Copy the contents of `seed-data.js`
+3. Paste into console
+4. Run: `seedProductivityBrain()`
+5. Refresh the page
+
+## 🎯 Try These Commands
+
+Once the app is running, try:
+
+### Tasks
+- "Show me my tasks"
+- "Add a task to finish the quarterly report"
+- "Display tasks as a Kanban board"
+
+### Calendar
+- "Show my calendar for this week"
+- "Schedule a meeting tomorrow at 2pm"
+
+### Focus
+- "Start a 25-minute focus timer"
+- "Suggest optimal times for deep work"
+
+### Notes
+- "Create a note about project ideas"
+- "Show all my notes"
+
+### Analytics
+- "Analyze my productivity this week"
+- "Show a progress chart for tasks"
+
+## 🔧 Troubleshooting
+
+### "Module not found" errors
+```bash
+rm -rf node_modules package-lock.json
+npm install
+```
+
+### Tambo API errors
+- Verify your API key in `.env.local`
+- Check that the file starts with `NEXT_PUBLIC_`
+- Restart the dev server after changing env vars
+
+### Components not rendering
+- Check browser console for errors
+- Verify all imports in `src/lib/tambo.ts`
+- Make sure component files exist in `src/components/`
+
+## 📚 Next Steps
+
+1. Read the full [README.md](./README.md)
+2. Explore [Tambo Documentation](https://docs.tambo.co)
+3. Customize components to fit your workflow
+4. Add backend storage for persistence
+5. Deploy to production!
+
+## 💡 Tips
+
+- Use **natural language** - the AI understands context
+- Be **specific** - "Show tasks due today" vs "Show tasks"
+- Try **combining actions** - "Add a task and start a focus timer"
+- Explore **different views** - ask for Kanban boards, calendars, charts
+
+## 🆘 Need Help?
+
+- Check the [README](./README.md) for detailed docs
+- Visit [Tambo Discord](https://discord.gg/dJNvPEHth6)
+- Review [Tambo Examples](https://github.com/tambo-ai/tambo)
+
+Happy productivity! 🎉
